@@ -8,9 +8,8 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-
 // Upload an image
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath, ex) => {
     try {
         if (!localFilePath) return null;
 
@@ -20,7 +19,12 @@ const uploadOnCloudinary = async (localFilePath) => {
         });
 
         //? file has been uploaded successful
-        console.log("file is uploaded on cloudinary",response.url);
+        //! console.log("file is uploaded on cloudinary",response.url);
+        console.log(fs.existsSync(localFilePath));
+        
+        if (ex) {
+            fs.unlinkSync(localFilePath);
+        } 
         return response;
 
     } catch (error) {

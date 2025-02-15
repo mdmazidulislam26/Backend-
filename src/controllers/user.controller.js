@@ -6,16 +6,19 @@ import { apiResponse } from '../utils/apiResponse.js';
 
 const registerUser = asyncHandler(async (req, res) => {
   // * get user details from frontend
-  const { fullName, emali, username, password } = req.body;
+  const { fullName, email, username, password } = req.body;
   
+  console.log(`${fullName} - ${email} - ${password} - ${username}`);
+  
+
   // * validation - not empty
-  if ([fullName,emali,username,password].some((field) => field.trim() ==='')){
+  if ([fullName,email,username,password].some((field) => field.trim() ==='' )){
     throw new apiError(400, "All fields are required");
    }
 
   // * check if user already exists : username, email
-  const existsUsername = User.findOne({ $or : [{ username }]});
-  const existsUserEmail = User.findOne({ $or : [{ emali }]});
+  const existsUsername = await User.findOne({ username });
+  const existsUserEmail = await User.findOne({ email});
   if (existsUsername && existsUserEmail) {
     throw new apiError( 409, "User with this email and username already exists!");
   } else if (existsUsername) {
@@ -25,16 +28,22 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // * check for images, check for avatar
-  const avatarLocalPath = req.files?.avatar[0]?.Path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.Path;
+  const avatarLocalPath = req.files?.avatar[0]?.path;
+  let coverImageLocalPath ;//= req.files?.coverImage[0]?.path;
+
+  if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverImageLocalPath = req.files?.coverImage[0]?.path;
+  }
 
   if (!avatarLocalPath) {
     throw new apiError( 400, "Avatar file is required");
   }
 
+  const ex = !(avatarLocalPath == coverImageLocalPath);
+
   // * upload them to cloudinary, avatar
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  const avatar = await uploadOnCloudinary(avatarLocalPath,ex);
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath,true);
 
   if (!avatar) {
     throw new apiError( 400, "Avatar file is required");
@@ -45,7 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     avatar : avatar.url,
     coverImage : coverImage?.url || "",
-    emali,
+    email,
     password,
     username : username.toLowerCase()
   })
@@ -63,8 +72,9 @@ const registerUser = asyncHandler(async (req, res) => {
   return res.status(201).json(
     new apiResponse(200, creatUser, 'User registered successfully!')
   );
+  
 });
 
-
+export { registerUser };
 
 
