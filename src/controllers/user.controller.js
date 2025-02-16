@@ -127,7 +127,10 @@ const loginUser = asyncHandler(async ( req, res ) =>{
 
   // * => 5
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
-
+  console.log('Access token : ',accessToken);
+  console.log('referesh token : ',refreshToken);
+  
+  
   // * => 6
   const loggedInUser = await User.findById(user._id)
   .select('-password -refreshToken');
@@ -147,12 +150,14 @@ const loginUser = asyncHandler(async ( req, res ) =>{
       {
         user : loggedInUser, accessToken, refreshToken
       },
-      'User logged In successfully'
+      'User logged In successfully',
     )
   );
 });
 
 const logoutUser = asyncHandler(async ( req, res ) =>{
+  console.log("hay");
+  
   await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -168,11 +173,12 @@ const logoutUser = asyncHandler(async ( req, res ) =>{
     httpOnly : true,
     secure : true
   }
-
+  // console.log();
+  
   return res
   .status(200)
-  .clearCookie('accessToken',accessToken)
-  .clearCookie('refereshToken',refreshToken)
+  // .clearCookie('accessToken',accessToken)
+  // .clearCookie('refereshToken',refreshToken)
   .json(new apiResponse(200, {}, 'User logged Out'))
 });
 
