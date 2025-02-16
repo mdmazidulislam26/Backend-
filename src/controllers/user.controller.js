@@ -142,7 +142,7 @@ const loginUser = asyncHandler(async ( req, res ) =>{
   .cookie('accessToken', accessToken, options)
   .cookie('refereshToken', refreshToken, options)
   .json(
-    new apiError(
+    new apiResponse(
       200,
       {
         user : loggedInUser, accessToken, refreshToken
