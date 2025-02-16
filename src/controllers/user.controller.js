@@ -11,7 +11,7 @@ const generateAccessAndRefreshToken = async(userId) => {
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
-    await user.save({ validitBeforeSave : false });
+    await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken}
 
@@ -139,8 +139,8 @@ const loginUser = asyncHandler(async ( req, res ) =>{
 
   return res
   .status(200)
-  .coockie('accessToken', accessToken, options)
-  .coockie('refereshToken', refreshToken, options)
+  .cookie('accessToken', accessToken, options)
+  .cookie('refereshToken', refreshToken, options)
   .json(
     new apiError(
       200,
