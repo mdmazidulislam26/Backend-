@@ -127,9 +127,9 @@ const loginUser = asyncHandler(async ( req, res ) =>{
 
   // * => 5
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+  console.log('Copy the token and Paste in Postman Authorization header');
   console.log('Access token : ',accessToken);
-  console.log('referesh token : ',refreshToken);
-  
+  // console.log('referesh token : ',refreshToken);
   
   // * => 6
   const loggedInUser = await User.findById(user._id)
@@ -148,7 +148,9 @@ const loginUser = asyncHandler(async ( req, res ) =>{
     new apiResponse(
       200,
       {
-        user : loggedInUser, accessToken, refreshToken
+        user : loggedInUser, 
+        accessToken, 
+        refreshToken
       },
       'User logged In successfully',
     )
@@ -156,7 +158,6 @@ const loginUser = asyncHandler(async ( req, res ) =>{
 });
 
 const logoutUser = asyncHandler(async ( req, res ) =>{
-  console.log("hay");
   
   await User.findByIdAndUpdate(
     req.user._id,
